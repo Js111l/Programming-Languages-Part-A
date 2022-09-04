@@ -8,7 +8,7 @@ fun same_string(s1 : string, s2 : string) =
 
 (* put your solutions for problem 1 here *)
 
-(*1. Write a function all_except_option, which takes a string and a string list. Return NONE if the
+(* (a) Write a function all_except_option, which takes a string and a string list. Return NONE if the
 string is not in the list, else return SOME lst where lst is identical to the argument list except the string
 is not in it. You may assume the string is in the list at most once. Use same_string, provided to you,
 to compare strings. Sample solution is around 8 lines.*)   
@@ -22,7 +22,7 @@ fun all_except_option (text: string,text2:string list)=
 	    case all_except_option(text,text2') of
 		SOME y=> SOME (x::y)
 		      | NONE  =>  all_except_option(text,text2')		      
-(*Write a function get_substitutions1, which takes a string list list (a list of list of strings, the
+(* (b)  Write a function get_substitutions1, which takes a string list list (a list of list of strings, the
 substitutions) and a string s and returns a string list. The result has all the strings that are in
 some list in substitutions that also has s, but s itself should not be in the result.*)	     
 	 	 	       
@@ -55,18 +55,20 @@ fun get_substitutions2 (strings: (string list) list,s: string )=
    
     end
 	
-(*Write a function similar_names, which takes a string list list of substitutions (as in parts (b) and
+(* (d) Write a function similar_names, which takes a string list list of substitutions (as in parts (b) and
 (c)) and a full name of type {first:string,middle:string,last:string} and returns a list of full
 names (type {first:string,middle:string,last:string} list). The result is all the full names you
 can produce by substituting for the first name (and only the first name) using substitutions and parts (b)
 or (c). The answer should begin with the original name (then have 0 or more other names).
 Do not eliminate duplicates from the answer. Hint: Use a local helper function. *)
 
-type r={first:string,middle:string,last:string};
 fun similar_names (strings: (string list)list,r:{first:string,middle:string,last:string} )=
-    let fun helper (strings:  string      list       ,r:{first:string,middle:string,last:string} ,acc:{first:string,middle:string,last:string} list   )=
-
-	    
+    let fun helper (strings: string list,r:{first:string,middle:string,last:string} ,acc:{first:string,middle:string,last:string} list   )=
+	    case (strings,r,acc) of
+		 ([],r,acc)=> acc
+	        |(strings,r,[])=> helper(strings,r,acc@[{first=(#first r),middle=(#middle r),last=(#last r)}])
+	        |(x::strings',r,acc)  => helper(strings',r,acc@[{first=x,middle=(#middle r),last=(#last r)}])
+  	    
 	    
     in
 	helper((get_substitutions2(strings,#first r)),r,[])
@@ -219,16 +221,16 @@ else
     end
 
 
-	
+(* tests: *)	
 val test1 = all_except_option ("string", ["string"]) = SOME []
 
 val test2 = get_substitutions1 ([["foo"],["there"]], "foo") = []
 
 val test3 = get_substitutions2 ([["foo"],["there"]], "foo") = []
-(*
+
 val test4 = similar_names ([["Fred","Fredrick"],["Elizabeth","Betty"],["Freddie","Fred","F"]], {first="Fred", middle="W", last="Smith"}) =
 	    [{first="Fred", last="Smith", middle="W"}, {first="Fredrick", last="Smith", middle="W"},
-	     {first="Freddie", last="Smith", middle="W"}, {first="F", last="Smith", middle="W"}]*)
+	     {first="Freddie", last="Smith", middle="W"}, {first="F", last="Smith", middle="W"}]
 
 val test5 = card_color (Clubs, Num 2) = Black
 
@@ -252,4 +254,4 @@ val test12 = officiate ([(Clubs,Ace),(Spades,Ace),(Clubs,Ace),(Spades,Ace)],
                          42);
 				false)		   
               handle IllegalMove => true)
-             (* works*)
+             
